@@ -1,0 +1,3 @@
+locals {
+  demo-tenant = "test"
+}

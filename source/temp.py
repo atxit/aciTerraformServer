@@ -1,5 +1,4 @@
 
-df_tf = build()
 
 
 df_tf = df_tf.loc[~df_tf['resourceId'].str.match('N/A')].copy()

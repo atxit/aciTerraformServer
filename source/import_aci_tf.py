@@ -21,8 +21,11 @@ def open_hcl_file(tf_file_path):
     :param tf_file_path: location of TF file
     :return: HCL in dict format
     """
-    with open(tf_file_path, encoding="UTF-8") as file_handler:
-        return hcl.load(file_handler)
+    try:
+        with open(tf_file_path, encoding="UTF-8") as file_handler:
+            return hcl.load(file_handler)
+    except ValueError:
+        return {}
 
 
 def extract_data_from_dict(dictionary, resource_id=""):
@@ -78,9 +81,9 @@ class ImportTfFiles(MongoConnector):
     df_tf = pd.DataFrame()
     locals_dict = {}
 
-    def __init__(self, file_location, return_frame=False):
+    def __init__(self, file_location, return_diff=False):
         super().__init__()
-        self.return_frame = return_frame
+        self.return_diff = return_diff
         self.import_time = time.time()
         self.file_location = file_location
 
@@ -125,14 +128,12 @@ class ImportTfFiles(MongoConnector):
             ],
             index=[i],
         )
-        print("Files starting with '.tf':")
-        print(file_path)
+
         hcl_dict = open_hcl_file(file_path)
         if "locals" in hcl_dict:
             locals_dict = hcl_dict["locals"]
             for key_local, value_local in locals_dict.items():
                 self.locals_dict.update({".".join(("local", key_local)): value_local})
-            print(self.locals_dict)
 
         if "resource" in hcl_dict or "module" in hcl_dict:
             for resource_key, resource_value in extract_data_from_dict(hcl_dict):
@@ -174,9 +175,16 @@ class ImportTfFiles(MongoConnector):
             )
             if len(df_diff_concat) > 0:
                 df_diff_concat.insert(0, "importTime", self.import_time)
+
+                if self.return_diff:
+                    return False, df_diff_concat
+
                 self.init_client(collection_name="aciTfCollectionDiff")
-                print(df_diff_concat)
                 self.write_collection(df_db=df_diff_concat)
+
+            return True, 'no diff detected'
+
+        return True, 'could not diff, past or present DataFrames missing'
 
     def apply_locals(self):
         """
@@ -190,19 +198,21 @@ class ImportTfFiles(MongoConnector):
     def main(self):
         """
         main processing block
-        :return: error (bool) and error message (if True) or False and DataFrame (if return_frame)
+        :return: error (bool) and error message (if True) or False and DataFrame (if return_diff)
          or None (if not)
         """
         self.search_tf_files()
         if len(self.tf_file_list) > 0:
             self.start_processing()
             self.apply_locals()
-            if self.return_frame:
-                return False, self.df_tf
-            self.perform_diff()
+            diff_error, df_diff = self.perform_diff()
+            if self.return_diff:
+                return diff_error, df_diff
+            
             self.init_client(collection_name="aciTfCollection")
             self.remove_collection()
             self.write_collection(df_db=self.df_tf)
+            print('completed')
             return False, None
         return True, f"no .tf files in {self.file_location}"
 

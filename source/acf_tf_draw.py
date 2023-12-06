@@ -48,7 +48,6 @@ while continue_processing:
         continue_processing = False
 
 
-
 def located_searched_item(df_root, resource_lookup):
     df_results = pd.DataFrame()
     remove_list = []

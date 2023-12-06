@@ -39,6 +39,23 @@ def landing_page():
     return open_file().replace('{{edges}}',json.dumps(edges)).replace('{{nodes}}',json.dumps(nodes))
 
 
+@app.route("/css/<path:path>", methods=["GET"])
+def return_css(path):
+    return send_file(f"static/css/{path}")
+
+
+@app.route("/js/<path:path>", methods=["GET"])
+def return_js(path):
+    return send_file(f"static/js/{path}")
+
+
+@app.route("/", methods=["GET"])
+@app.route("/table", methods=["GET"])
+def table_page():
+    return render_template('table.html')
+
+
+
 if __name__ == "__main__":
     app.run(use_reloader=False, port=5020, debug=True, host="0.0.0.0")
 

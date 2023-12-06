@@ -1,13 +1,12 @@
-from import_aci_tf.import_aci_tf_db import (rename_local,
-                                            open_hcl_file,
-                                            extract_data_from_dict,
-                                            resolve_resource_id
-                                            )
+import sys
+from unittest.mock import patch, MagicMock
+import pytest
 
-
-
-def test_rename_local():
-    assert rename_local('test') == ''.join(("local.",'test'))
+from source.import_aci_tf import (open_hcl_file,
+                                  extract_data_from_dict,
+                                  resolve_resource_id,
+parse_args,ImportTfFiles
+                                  )
 
 
 def test_open_hcl_file(sample_hcl_file):
@@ -70,3 +69,27 @@ def test_resolve_resource_id():
     resource_key_5 = ''
     expected_result_5 = 'N/A'
     assert resolve_resource_id(resource_key_5) == expected_result_5
+
+
+def test_parse_args():
+    # Test case 1: Valid folder location provided
+    with patch.object(sys, 'argv', ['script_name', '-f', '/path/to/folder']):
+        result = parse_args()
+        assert result == '/path/to/folder'
+
+    # Test case 2: No folder location provided (should print message and exit)
+    with patch.object(sys, 'argv', ['script_name']):
+        with pytest.raises(SystemExit) as e:
+            parse_args()
+        assert e.value.code == 1
+
+
+def test_import_tf_files():
+    # Test case 1: Valid file location provided
+    with patch('source.import_aci_tf.glob.glob', return_value=['/path/to/file1.tf', '/path/to/file2.tf']):
+        import_tf = ImportTfFiles('/path/to', return_frame=True)
+        import_tf.search_tf_files()
+
+        # Ensure tf_file_list is populated correctly
+        assert import_tf.tf_file_list == ['/path/to/file1.tf', '/path/to/file2.tf']
+

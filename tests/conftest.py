@@ -1,5 +1,5 @@
 import pytest
-from import_aci_tf.import_aci_tf_db import open_hcl_file
+
 
 @pytest.fixture
 def sample_hcl_file(tmp_path):

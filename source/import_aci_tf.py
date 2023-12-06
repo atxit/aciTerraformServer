@@ -14,6 +14,7 @@ import numpy as np
 import hcl
 
 from source.mongo_connect import MongoConnector
+from source.constants import *
 
 
 def open_hcl_file(tf_file_path):
@@ -119,13 +120,7 @@ class ImportTfFiles(MongoConnector):
         """
         i = 1
         df_tf = pd.DataFrame(
-            columns=[
-                "file",
-                "resourceType",
-                "resourceId",
-                "resourceKey",
-                "resourceValue",
-            ],
+            columns=FIELD_LIST,
             index=[i],
         )
 

@@ -14,6 +14,9 @@ import json
 from pathlib import Path
 import os
 
+from source.mongo_connect import MongoConnector
+from source.constants import *
+
 urllib3.disable_warnings()
 
 def open_file():
@@ -51,8 +54,33 @@ def return_js(path):
 
 @app.route("/", methods=["GET"])
 @app.route("/table", methods=["GET"])
-def table_page():
+def get_table_page():
     return render_template('table.html')
+
+
+@app.route("/table", methods=["POST"])
+def post_table_page():
+    resp_dict = {}
+    mongo_conn = MongoConnector()
+    mongo_conn.init_client('aciTfCollection')
+    df_results = mongo_conn.search_all_columns_for_item(request.get_json().get('search'))
+    if len(df_results) > 0:
+        resp_dict.update({'error': False, 'data': df_results.to_html(
+                index=False, border=1, table_id="response-table", justify="center", classes='data-table')})
+    else:
+        resp_dict.update({'error': True, 'errorMsg': 'no results found'})
+    return jsonify(resp_dict)
+
+from source.acf_tf_draw import fetch_tf_collection
+
+@app.route("/draw", methods=["GET"])
+def get_draw_page():
+    mongo_conn = MongoConnector()
+    mongo_conn.init_client('aciTfCollection')
+    print(mongo_conn.return_distinct_values_of_column('resourceId'))
+    df_deps, _ = fetch_tf_collection()
+
+    return render_template('draw.html')
 
 
 

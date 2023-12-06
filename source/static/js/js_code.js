@@ -5,7 +5,17 @@ async function postData(postData, route, returnToId) {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(postData),
         }).then((response) => response.json())
-                .then((data) => {return data})
+                .then((resp) => {
+                    console.log(resp)
+                    let results = document.getElementById(returnToId)
+                    if (resp['error']) {
+                        results.innerHTML = ''
+                        alert(resp['errorMsg'])
+                    } else {
+                        results.innerHTML = ''
+                        results.innerHTML = resp['data']
+                    }
+                })
     } catch (error) {
         alert('API error')
     }
@@ -13,8 +23,11 @@ async function postData(postData, route, returnToId) {
 
 
 function tableSearch() {
-  let tableInput = document.getElementById('table-input').value
-  if (tableInput === '') {
-    alert('empty input')
+  let tableInputValue = document.getElementById('table-input').value
+  if (tableInputValue === '') {
+      document.getElementById('results').innerHTML = ''
+      alert('empty input')
+  } else {
+      postData({'search': tableInputValue}, 'table', 'results')
   }
 }

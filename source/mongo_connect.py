@@ -1,9 +1,12 @@
 """
 Mongo Connector is responsible for all interactions between the code and the mongo DB
 """
-import pymongo
+from datetime import datetime, timezone
 
+import pymongo
 import pandas as pd
+
+from source.constants import *
 
 
 class MongoConnector:
@@ -37,6 +40,24 @@ class MongoConnector:
         """
         _ = self.collection.insert_many(df_db.to_dict("records"))
 
+    def search_all_columns_for_item(self,searched_item):
+        df_results = pd.DataFrame()
+
+        for column_id in FIELD_LIST:
+            if searched_item != 'all':
+                query_dict = {column_id: {'$regex': searched_item, '$options': 'i'}}
+            else:
+                query_dict = {}
+            df_results = pd.concat([df_results, pd.DataFrame(
+                list(self.collection.find(query_dict)))])
+
+        if len(df_results) > 0:
+            df_results.drop_duplicates(inplace=True)
+            df_results.drop(columns=['_id'], inplace=True)
+            df_results['importTime'] = df_results['importTime'].apply(epoch_to_utc)
+        print(df_results)
+        return df_results
+
     def return_value_from_table(self, searched_column, find_key, return_value_in):
         """
         :param searched_column: the column (head/field) in which to search for the key.
@@ -64,3 +85,11 @@ class MongoConnector:
             df_returned.drop(columns=["_id"], inplace=True)
             return df_returned
         return pd.DataFrame()
+
+    def return_distinct_values_of_column(self, column_name):
+        return self.collection.distinct(column_name)
+
+def epoch_to_utc(epoch_value):
+    utc_datetime = datetime.utcfromtimestamp(epoch_value).replace(tzinfo=timezone.utc)
+    return utc_datetime.strftime('%Y-%m-%d %H:%M:%S UTC')
+

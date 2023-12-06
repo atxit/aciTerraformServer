@@ -1,0 +1,1 @@
+FIELD_LIST = ["file", "resourceType", "resourceId", "resourceKey", "resourceValue", ]

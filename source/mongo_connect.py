@@ -7,7 +7,7 @@ import pymongo
 from bson.objectid import ObjectId
 import pandas as pd
 
-from source.constants import FIELD_LIST
+from source.constants import SEARCH_LIST
 
 
 class MongoConnector:
@@ -49,7 +49,7 @@ class MongoConnector:
         """
         df_results = pd.DataFrame()
 
-        for column_id in FIELD_LIST:
+        for column_id in SEARCH_LIST:
             if searched_item != 'all':
                 query_dict = {column_id: {'$regex': searched_item, '$options': 'i'}}
             else:

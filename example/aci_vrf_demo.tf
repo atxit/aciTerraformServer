@@ -3,7 +3,7 @@ resource "aci_vrf" "demo-VRF" {
   name                   = "demo_vrf"
   description            = "from terraform"
   annotation             = "tag_vrf"
-  bd_enforced_enable     = "yes"
+  bd_enforced_enable     = "no"
   ip_data_plane_learning = "enabled"
   knw_mcast_act          = "deny"
   name_alias             = "alias_vrf"

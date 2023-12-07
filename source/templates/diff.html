@@ -11,7 +11,7 @@
 <div class="topnav">
   <a href="table">Table</a>
   <a href="import">Import</a>
-  <a href="draw">Draw</a>
+  <a href="draw">Visualise</a>
   <a href="compare">Compare</a>
   <a class="active" href="diff">Diff Logs</a>
 </div>
@@ -21,6 +21,10 @@
 <button id="diff-search-button" onclick="diffSearch()">Begin</button>
   <div id="results"></div>
 </div>
-
+<div style="text-align: center; width: 100%;" id="processingDialog" class="modal">
+    <div class="ring">
+      <span></span>
+    </div>
+</div>
 </body>
 </html>

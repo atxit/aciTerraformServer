@@ -8,6 +8,7 @@ async function postData(postData, route, returnToId) {
                 .then((resp) => {
                     console.log(resp)
                     let results = document.getElementById(returnToId)
+                     document.getElementById('processingDialog').style.display = 'none'
                     if (resp['error']) {
                         results.innerHTML = ''
                         alert(resp['errorMsg'])
@@ -27,6 +28,7 @@ function diffSearch() {
       document.getElementById('results').innerHTML = ''
       alert('empty input')
   } else {
+      document.getElementById('processingDialog').style.display = 'block'
       postData({'search': diffInputValue}, 'diff', 'results')
   }
 }
@@ -37,6 +39,7 @@ function tableSearch() {
       document.getElementById('results').innerHTML = ''
       alert('empty input')
   } else {
+      document.getElementById('processingDialog').style.display = 'block'
       postData({'search': tableInputValue}, 'table', 'results')
   }
 }
@@ -46,7 +49,19 @@ function startImport() {
   if (importInputValue === '') {
       alert('empty input')
   } else {
+      document.getElementById('processingDialog').style.display = 'block'
       postData({'path': importInputValue}, 'import', 'results')
   }
 }
+
+function startCompare() {
+  let compareInputValue = document.getElementById('compare-input').value
+  if (compareInputValue === '') {
+      alert('empty input')
+  } else {
+      document.getElementById('processingDialog').style.display = 'block'
+      postData({'path': compareInputValue}, 'compare', 'results')
+  }
+}
+
 

@@ -14,6 +14,7 @@ var filter = {
 };
 
 async function drawDeps(ele) {
+    document.getElementById('processingDialog').style.display = 'block'
     try {
         return await fetch('draw', {
             method: 'POST',
@@ -21,7 +22,7 @@ async function drawDeps(ele) {
             body: JSON.stringify({'resource': ele.value}),
         }).then((response) => response.json())
                 .then((resp) => {
-                    console.log(resp)
+                     document.getElementById('processingDialog').style.display = 'none'
                     if (resp['error']) {
                         alert(resp['errorMsg'])
                     } else {
@@ -43,7 +44,6 @@ function drawGraph(nodeList,edgeList) {
   container.width = 4000
   container.style.width = 'auto'
   container.style.height = '1000px'
-  // parsing and collecting nodes and edges from the python
   nodes = new vis.DataSet(nodeList);
   edges = new vis.DataSet(edgeList);
 

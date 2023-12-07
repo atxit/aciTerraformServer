@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import hcl
 
-from source.mongo_connect import MongoConnector
+from source.mongo_connect import MongoConnector, epoch_to_utc
 from source.constants import FIELD_LIST
 
 
@@ -187,6 +187,7 @@ class ImportTfFiles:
                 df_diff_concat.insert(0, "importTime", self.import_time)
 
                 if self.return_diff:
+                    df_diff_concat['importTime'] = df_diff_concat['importTime'].apply(epoch_to_utc)
                     return False, df_diff_concat
 
                 mongo_connector_diff = MongoConnector()

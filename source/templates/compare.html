@@ -9,16 +9,16 @@
 <body>
 
 <div class="topnav">
-  <a  href="table">Table</a>
-  <a class="active" href="import">Import</a>
+  <a href="table">Table</a>
+  <a href="import">Import</a>
   <a href="draw">Visualise</a>
-  <a href="compare">Compare</a>
+  <a class="active" href="compare">Compare</a>
   <a href="diff">Diff Logs</a>
 </div>
 
 <div style="padding-left:16px;">
-<input id="import-input" style="width: 500px;" placeholder="enter absolute/full path" value="{{ absolute_path }}">
-<button id="table-search-button" onclick="startImport()">Import</button>
+<input id="compare-input" style="width: 500px;" placeholder="enter absolute/full path">
+<button id="compare-search-button" onclick="startCompare()">Compare</button>
   <div id="results"></div>
 </div>
 <div style="text-align: center; width: 100%;" id="processingDialog" class="modal">
@@ -26,6 +26,5 @@
       <span></span>
     </div>
 </div>
-
 </body>
 </html>

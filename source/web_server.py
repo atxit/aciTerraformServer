@@ -53,35 +53,6 @@ def post_table_query():
     return jsonify(process_table_query_request(request.url, request.get_json()))
 
 
-def process_table_query_request(request_url, request_json):
-    resp_dict = {}
-    mongo_conn = MongoConnector()
-    print(request_url.split("/")[-1])
-    if request_url.split("/")[-1] == "table":
-        mongo_conn.init_client("aciTfCollection")
-    else:
-        mongo_conn.init_client("aciTfCollectionDiff")
-    df_results = mongo_conn.search_all_columns_for_item(
-        request_json.get("search")
-    )
-    if len(df_results) > 0:
-        resp_dict.update(
-            {
-                "error": False,
-                "data": df_results.to_html(
-                    index=False,
-                    border=1,
-                    table_id="response-table",
-                    justify="center",
-                    classes="data-table",
-                ),
-            }
-        )
-    else:
-        resp_dict.update({"error": True, "errorMsg": "no results found"})
-    return resp_dict
-
-
 @app.route("/draw", methods=["GET"])
 def get_draw_page():
     """
@@ -133,6 +104,7 @@ def post_import_page():
     """
     import_tf_files = ImportTfFiles(file_location=request.get_json().get("path"))
     error, error_msg = import_tf_files.main()
+
     if error:
         return jsonify({"error": error, "errorMsg": error_msg})
 
@@ -144,7 +116,89 @@ def post_import_page():
         update_column="value",
         updated_value=request.get_json().get("path"),
     )
+
     return jsonify({"error": error, "data": "successful import"})
+
+
+@app.route("/compare", methods=["GET"])
+def get_compare_page():
+    """
+    :return: diff HTML
+    """
+    return render_template("compare.html")
+
+
+@app.route("/compare", methods=["POST"])
+def post_compare_query():
+    """
+    API receiver, responds to API requests to the diff and table flask routes
+    searches table, returns matches and creates HTML table
+    :return: JSON
+    """
+    return jsonify(process_compare_request(request.get_json()))
+
+
+def process_compare_request(request_json):
+    """
+    creates an HTML table of the searched results
+
+    :param request_url: the request URL
+    :param request_json: JSON payload
+    :return: result dict
+    """
+    resp_dict = {}
+    import_tf_files = ImportTfFiles(request_json.get("path"), return_diff=True)
+    error, results = import_tf_files.main()
+    if not error:
+        resp_dict.update(
+            {
+                "error": False,
+                "data": results.to_html(
+                    index=False,
+                    border=1,
+                    table_id="response-table",
+                    justify="center",
+                    classes="data-table",
+                ),
+            }
+        )
+    else:
+        resp_dict.update({"error": True, "errorMsg": results})
+    return resp_dict
+
+
+def process_table_query_request(request_url, request_json):
+    """
+    creates an HTML table of the searched results
+
+    :param request_url: the request URL
+    :param request_json: JSON payload
+    :return: result dict
+    """
+    resp_dict = {}
+    mongo_conn = MongoConnector()
+    print(request_url.split("/")[-1])
+    if request_url.split("/")[-1] == "table":
+        mongo_conn.init_client("aciTfCollection")
+    else:
+        mongo_conn.init_client("aciTfCollectionDiff")
+    df_results = mongo_conn.search_all_columns_for_item(request_json.get("search"))
+    if len(df_results) > 0:
+        resp_dict.update(
+            {
+                "error": False,
+                "data": df_results.to_html(
+                    index=False,
+                    border=1,
+                    table_id="response-table",
+                    justify="center",
+                    classes="data-table",
+                ),
+            }
+        )
+    else:
+        resp_dict.update({"error": True, "errorMsg": "no results found"})
+    return resp_dict
 
 
 def create_resource_selection():

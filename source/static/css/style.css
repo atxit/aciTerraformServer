@@ -86,3 +86,12 @@ input {
     font-weight: bold;
     color: #009879;
 }
+
+#mynetwork {
+    width: 1000px;
+    height: 500px;
+    background-color: #ffffff;
+    border: 1px solid lightgray;
+    position: relative;
+    float: left;
+}

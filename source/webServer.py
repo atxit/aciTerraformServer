@@ -6,7 +6,7 @@ from flask import (
     send_file,
     redirect,
     url_for,
-    session,
+    session
 )
 
 import urllib3
@@ -15,6 +15,7 @@ from pathlib import Path
 import os
 
 from source.mongo_connect import MongoConnector
+from source.aci_tf_draw import TfDraw
 from source.constants import *
 
 urllib3.disable_warnings()
@@ -71,17 +72,46 @@ def post_table_page():
         resp_dict.update({'error': True, 'errorMsg': 'no results found'})
     return jsonify(resp_dict)
 
-from source.acf_tf_draw import fetch_tf_collection
+from markupsafe import Markup
 
 @app.route("/draw", methods=["GET"])
 def get_draw_page():
+    test = Markup(create_resource_selection())
+    return render_template('draw.html', resource_selection=test)
+
+
+@app.route("/draw", methods=["POST"])
+def post_draw_page():
+    tf_draw = TfDraw(request.get_json().get('resource'))
+    node_list,edge_list = tf_draw.main()
+    return jsonify({'error': False, 'data' : {'nodes' : node_list, 'edges': edge_list}})
+
+#resource_lookup = "aci_vrf.demo-VRF.id"
+
+#tf_draw = TfDraw(resource_lookup)
+#node_list,edge_list = tf_draw.main()
+
+#print(node_list)
+#print(edge_list)
+
+
+def create_resource_selection():
+    select_str = ''' <label for="resourceId">Select a Resource ID:</label>
+                    <select id="resourceId" onchange="drawDeps(this)">'''
     mongo_conn = MongoConnector()
     mongo_conn.init_client('aciTfCollection')
-    print(mongo_conn.return_distinct_values_of_column('resourceId'))
-    df_deps, _ = fetch_tf_collection()
-
-    return render_template('draw.html')
-
+    resource_list = mongo_conn.return_distinct_values_of_column('resourceId')
+    if len(resource_list) > 0:
+        if 'N/A' in resource_list:
+            resource_list.remove('N/A')
+        if 'failed to import' in resource_list:
+            resource_list.remove('failed to import')
+        resource_list.sort()
+        resource_list.insert(0,'')
+    for resource_id in resource_list:
+        select_str += f'<option value="{resource_id}">{resource_id}</option>'
+    select_str += '</select>'
+    return select_str
 
 
 if __name__ == "__main__":

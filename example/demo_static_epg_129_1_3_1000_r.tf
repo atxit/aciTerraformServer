@@ -27,4 +27,5 @@ resource "aci_epg_to_static_path" "path-129-1-3-997-r" {
   mode  = "regular"
   primary_encap ="vlan-997"
 }
-resource "aci_epg_to_static_path" "path-129-1-3-997-r" {}}
+
+

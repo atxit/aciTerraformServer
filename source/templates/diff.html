@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head title="Table">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="/js/js_code.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/style.css" />
+<title>Table</title>
+</head>
+<body>
+
+<div class="topnav">
+  <a href="table">Table</a>
+  <a href="import">Import</a>
+  <a href="draw">Draw</a>
+  <a href="compare">Compare</a>
+  <a class="active" href="diff">Diff Logs</a>
+</div>
+
+<div style="padding-left:16px;">
+<input id="diff-input" placeholder="search all columns or enter all to see full table">
+<button id="diff-search-button" onclick="diffSearch()">Begin</button>
+  <div id="results"></div>
+</div>
+
+</body>
+</html>

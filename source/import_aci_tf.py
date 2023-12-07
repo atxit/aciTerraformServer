@@ -74,7 +74,7 @@ def parse_args():
     return args.f
 
 
-class ImportTfFiles(MongoConnector):
+class ImportTfFiles:
     """
     import TF class
     """
@@ -88,6 +88,9 @@ class ImportTfFiles(MongoConnector):
         self.return_diff = return_diff
         self.import_time = time.time()
         self.file_location = file_location
+        self.mongo_connector_aci_tf = MongoConnector()
+        self.mongo_connector_aci_tf.init_client(collection_name="aciTfCollection")
+
 
     def search_tf_files(self):
         """
@@ -161,8 +164,8 @@ class ImportTfFiles(MongoConnector):
         for a removal or addition, only one line is present
         :return:
         """
-        self.init_client(collection_name="aciTfCollection")
-        df_past = self.return_full_collection()
+
+        df_past = self.mongo_connector_aci_tf.return_full_collection()
         if len(df_past) > 0 and len(self.df_tf) > 0:
             df_present = copy.deepcopy(self.df_tf)
             df_present.insert(0, "updateType", "addition")
@@ -186,8 +189,15 @@ class ImportTfFiles(MongoConnector):
                 if self.return_diff:
                     return False, df_diff_concat
 
-                self.init_client(collection_name="aciTfCollectionDiff")
-                self.write_collection(df_db=df_diff_concat)
+                mongo_connector_diff = MongoConnector()
+                mongo_connector_diff.init_client(collection_name="aciTfCollectionDiff")
+
+                mongo_connector_diff.write_collection(df_db=df_diff_concat.sort_values(by=[
+                        "resourceType",
+                        "resourceId",
+                        "resourceKey",
+                        "resourceValue",
+                    ]))
 
             return True, "no diff detected"
 
@@ -216,9 +226,8 @@ class ImportTfFiles(MongoConnector):
             if self.return_diff:
                 return diff_error, df_diff
 
-            self.init_client(collection_name="aciTfCollection")
-            self.remove_collection()
-            self.write_collection(df_db=self.df_tf)
+            self.mongo_connector_aci_tf.remove_collection()
+            self.mongo_connector_aci_tf.write_collection(df_db=self.df_tf)
             print("completed")
             return False, None
         return True, f"no .tf files in {self.file_location}"

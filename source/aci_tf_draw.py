@@ -1,3 +1,8 @@
+"""
+ACI TF Draw is responsible for generating the interdependencies table. Next, the code
+ will identify paths which match the user input selection. Lastly, the code will generate a
+ node and edge array used by the front end to generate the diagram.
+"""
 import pandas as pd
 import numpy as np
 
@@ -5,12 +10,20 @@ from source.mongo_connect import MongoConnector
 
 
 class TfDraw:
+    """
+    The drawing class
+    """
+
     def __init__(self, search_resource):
         self.search_resource = search_resource
         self.df_results = pd.DataFrame()
         self.df_root = pd.DataFrame()
 
     def fetch_tf_collection(self):
+        """
+        Builds a table which contains the TF resource dependencies
+        :return:
+        """
         mongo_conn = MongoConnector()
         mongo_conn.init_client(collection_name="aciTfCollection")
         df_tf = mongo_conn.return_full_collection()
@@ -47,24 +60,38 @@ class TfDraw:
         print(df_deps)
 
     def located_searched_item(self):
+        """
+        filters the dependencies table using the users input (search_resource)
+        :return:
+        """
         remove_list = []
         searching = True
         for column_id in self.df_root.columns:
-            df_column = self.df_root.loc[self.df_root[column_id].str.contains(self.search_resource)].copy()
+            df_column = self.df_root.loc[
+                self.df_root[column_id].str.contains(self.search_resource)
+            ].copy()
             if len(df_column) == 0 and searching:
                 remove_list.append(column_id)
             else:
                 searching = False
                 self.df_results = pd.concat([self.df_results, df_column])
-        self.df_results = self.df_results.replace("", np.nan).dropna(axis=1, how="all").fillna("")
+        self.df_results = (
+            self.df_results.replace("", np.nan).dropna(axis=1, how="all").fillna("")
+        )
         self.df_results.index = np.arange(1, len(self.df_results) + 1)
-        #print(self.df_results)
+        # print(self.df_results)
 
     def create_network_x_node_ids(self):
+        """
+        :return: the node list used by the front end to generate the diagram
+        """
         node_id_list = []
         for i in self.df_results.index:
             for c in self.df_results.columns:
-                if self.df_results.at[i, c] != "" and self.df_results.at[i, c] not in node_id_list:
+                if (
+                    self.df_results.at[i, c] != ""
+                    and self.df_results.at[i, c] not in node_id_list
+                ):
                     node_id_list.append(self.df_results.at[i, c])
 
         node_list = []
@@ -85,6 +112,10 @@ class TfDraw:
         return node_list
 
     def create_network_x_edge_ids(self):
+        """
+        the edge list used by the front end to generate the diagram
+        :return: edge list [{'from' : 'x', 'to' : 'y'},{'from' : 'y', 'to' : 'z'}]
+        """
         edge_id_list = []
         for i in self.df_results.index:
             for c in self.df_results.columns:
@@ -92,11 +123,15 @@ class TfDraw:
                     if (
                         self.df_results.at[i, c] != ""
                         and self.df_results.at[i, c + 1] != ""
-                        and ":".join((self.df_results.at[i, c], self.df_results.at[i, c + 1]))
+                        and ":".join(
+                            (self.df_results.at[i, c], self.df_results.at[i, c + 1])
+                        )
                         not in edge_id_list
                     ):
                         edge_id_list.append(
-                            ":".join((self.df_results.at[i, c], self.df_results.at[i, c + 1]))
+                            ":".join(
+                                (self.df_results.at[i, c], self.df_results.at[i, c + 1])
+                            )
                         )
                 except KeyError:
                     pass
@@ -113,11 +148,10 @@ class TfDraw:
         return edge_list
 
     def main(self):
+        """
+        Main execution block
+        :return: node and edge lists (arrays)
+        """
         self.fetch_tf_collection()
         self.located_searched_item()
-        return self.create_network_x_node_ids(),self.create_network_x_edge_ids()
-
-
-
-
-
+        return self.create_network_x_node_ids(), self.create_network_x_edge_ids()

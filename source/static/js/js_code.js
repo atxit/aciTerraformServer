@@ -21,6 +21,15 @@ async function postData(postData, route, returnToId) {
     }
 }
 
+function diffSearch() {
+  let diffInputValue = document.getElementById('diff-input').value
+  if (diffInputValue === '') {
+      document.getElementById('results').innerHTML = ''
+      alert('empty input')
+  } else {
+      postData({'search': diffInputValue}, 'diff', 'results')
+  }
+}
 
 function tableSearch() {
   let tableInputValue = document.getElementById('table-input').value
@@ -31,3 +40,13 @@ function tableSearch() {
       postData({'search': tableInputValue}, 'table', 'results')
   }
 }
+
+function startImport() {
+  let importInputValue = document.getElementById('import-input').value
+  if (importInputValue === '') {
+      alert('empty input')
+  } else {
+      postData({'path': importInputValue}, 'import', 'results')
+  }
+}
+

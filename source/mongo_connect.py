@@ -96,11 +96,24 @@ class MongoConnector:
         return pd.DataFrame()
 
     def return_distinct_values_of_column(self, column_name):
+        """
+        :param column_name: returns a list of distinct values from a column
+        :return: distinct column list
+        """
         return self.collection.distinct(column_name)
 
     def insert_single_value(
         self, search_column, search_value, update_column, updated_value
     ):
+        """
+        inserts a single value using input arguments
+        :param search_column: the column to search when looking for the
+            search value
+        :param search_value: the searched value
+        :param update_column: the column in which the change will be made
+        :param updated_value: the updated value
+        :return:
+        """
         df_rows_that_matched = pd.DataFrame(
             list(self.collection.find({search_column: search_value}))
         )

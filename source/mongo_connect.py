@@ -62,7 +62,7 @@ class MongoConnector:
             df_results.drop_duplicates(inplace=True)
             df_results.drop(columns=["_id"], inplace=True)
             df_results["importTime"] = df_results["importTime"].apply(epoch_to_utc)
-        print(df_results)
+
         return df_results
 
     def return_value_from_table(self, searched_column, find_key, return_value_in):

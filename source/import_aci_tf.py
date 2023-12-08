@@ -249,7 +249,6 @@ class ImportTfFiles:
 
 
 
-
 if __name__ == "__main__":
     import_tf_files = ImportTfFiles(parse_args()) # pragma: no cover
     error, error_msg = import_tf_files.main() # pragma: no cover

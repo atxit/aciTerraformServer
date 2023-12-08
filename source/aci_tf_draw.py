@@ -57,7 +57,6 @@ class TfDraw:
             column_ref += 1
             if current_shape == self.df_root.shape:
                 continue_processing = False
-        print(df_deps)
 
     def located_searched_item(self):
         """
@@ -79,7 +78,6 @@ class TfDraw:
             self.df_results.replace("", np.nan).dropna(axis=1, how="all").fillna("")
         )
         self.df_results.index = np.arange(1, len(self.df_results) + 1)
-        # print(self.df_results)
 
     def create_network_x_node_ids(self):
         """
@@ -154,4 +152,6 @@ class TfDraw:
         """
         self.fetch_tf_collection()
         self.located_searched_item()
-        return self.create_network_x_node_ids(), self.create_network_x_edge_ids()
+        node_id_list = self.create_network_x_node_ids()
+        edge_id_list = self.create_network_x_edge_ids()
+        return node_id_list, edge_id_list

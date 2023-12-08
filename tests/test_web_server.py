@@ -8,7 +8,7 @@ from source.web_server import (
     process_table_query_request,
     process_compare_request,
     create_resource_selection,
-    create_cfg_collection
+    create_cfg_collection,
 )
 
 PYTHONPATH = os.environ.get("PYTHONPATH")
@@ -23,13 +23,7 @@ def test_return_css_route(client):
     response = client.get("/css/style.css")
     assert response.status_code == 200
     assert (
-        open_file(
-            str(
-                Path(
-                    PYTHONPATH, "source", "static", "css", "style.css"
-                )
-            )
-        )
+        open_file(str(Path(PYTHONPATH, "source", "static", "css", "style.css")))
         in response.data.decode()
     )
 
@@ -43,13 +37,7 @@ def test_return_js_route(client):
     response = client.get("/js/js_draw.js")
     assert response.status_code == 200
     assert (
-        open_file(
-            str(
-                Path(
-                    PYTHONPATH, "source", "static", "js", "js_draw.js"
-                )
-            )
-        )
+        open_file(str(Path(PYTHONPATH, "source", "static", "js", "js_draw.js")))
         in response.data.decode()
     )
 
@@ -63,18 +51,14 @@ def test_get_table_page_route(client):
     response = client.get("/")
     assert response.status_code == 200
     assert (
-        open_file(
-            str(Path(PYTHONPATH, "source", "templates", "table.html"))
-        )
+        open_file(str(Path(PYTHONPATH, "source", "templates", "table.html")))
         in response.data.decode()
     )
 
     response = client.get("/table")
     assert response.status_code == 200
     assert (
-        open_file(
-            str(Path(PYTHONPATH, "source", "templates", "table.html"))
-        )
+        open_file(str(Path(PYTHONPATH, "source", "templates", "table.html")))
         in response.data.decode()
     )
 
@@ -146,9 +130,7 @@ def test_get_diff_page(client):
     response = client.get("diff")
     assert response.status_code == 200
     assert (
-        open_file(
-            str(Path(PYTHONPATH, "source", "templates", "diff.html"))
-        )
+        open_file(str(Path(PYTHONPATH, "source", "templates", "diff.html")))
         in response.data.decode()
     )
 
@@ -201,13 +183,7 @@ def test_get_compare_page(client):
     response = client.get("compare")
     assert response.status_code == 200
     assert (
-        open_file(
-            str(
-                Path(
-                    PYTHONPATH, "source", "templates", "compare.html"
-                )
-            )
-        )
+        open_file(str(Path(PYTHONPATH, "source", "templates", "compare.html")))
         in response.data.decode()
     )
 

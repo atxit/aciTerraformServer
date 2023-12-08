@@ -239,5 +239,7 @@ def create_cfg_collection():
 
 
 if __name__ == "__main__":
-    create_cfg_collection()
-    app.run(use_reloader=False, port=5020, debug=True, host="0.0.0.0")
+    create_cfg_collection()  # pragma: no cover
+    app.run(
+        use_reloader=False, port=5020, debug=True, host="0.0.0.0"
+    )  # pragma: no cover

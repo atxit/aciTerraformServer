@@ -82,15 +82,13 @@ class ImportTfFiles:
     tf_file_list = []
     df_tf = pd.DataFrame()
     locals_dict = {}
+    mongo_connector_aci_tf = None
+    import_time = 0
 
     def __init__(self, file_location, return_diff=False):
         super().__init__()
-        self.return_diff = return_diff
-        self.import_time = time.time()
         self.file_location = file_location
-        self.mongo_connector_aci_tf = MongoConnector()
-        self.mongo_connector_aci_tf.init_client(collection_name="aciTfCollection")
-
+        self.return_diff = return_diff
 
     def search_tf_files(self):
         """
@@ -113,6 +111,7 @@ class ImportTfFiles:
                     [self.df_tf, future_results.result()], axis=0, sort=False
                 )
 
+        print(self.df_tf)
         self.df_tf.index = np.arange(1, len(self.df_tf) + 1)
         if len(self.df_tf) > 0:
             self.df_tf.insert(0, "importTime", self.import_time)
@@ -129,6 +128,7 @@ class ImportTfFiles:
         )
 
         hcl_dict = open_hcl_file(file_path)
+        print(hcl_dict)
         if "locals" in hcl_dict:
             locals_dict = hcl_dict["locals"]
             for key_local, value_local in locals_dict.items():
@@ -139,7 +139,9 @@ class ImportTfFiles:
             return pd.DataFrame()
 
         if "resource" in hcl_dict or "module" in hcl_dict:
+            print(hcl_dict)
             for resource_key, resource_value in extract_data_from_dict(hcl_dict):
+                print(resource_key)
                 df_tf.loc[i, "file"] = file_path
                 df_tf.loc[i, "resourceType"] = str(resource_key.split(".")[1])
                 df_tf.loc[i, "resourceId"] = str(resolve_resource_id(resource_key))
@@ -187,18 +189,26 @@ class ImportTfFiles:
                 df_diff_concat.insert(0, "importTime", self.import_time)
 
                 if self.return_diff:
-                    df_diff_concat['importTime'] = df_diff_concat['importTime'].apply(epoch_to_utc)
+                    print(df_diff_concat)
+                    df_diff_concat["importTime"] = df_diff_concat["importTime"].apply(
+                        epoch_to_utc
+                    )
                     return False, df_diff_concat
 
                 mongo_connector_diff = MongoConnector()
                 mongo_connector_diff.init_client(collection_name="aciTfCollectionDiff")
 
-                mongo_connector_diff.write_collection(df_db=df_diff_concat.sort_values(by=[
-                        "resourceType",
-                        "resourceId",
-                        "resourceKey",
-                        "resourceValue",
-                    ]))
+                mongo_connector_diff.write_collection(
+                    df_db=df_diff_concat.sort_values(
+                        by=[
+                            "resourceType",
+                            "resourceId",
+                            "resourceKey",
+                            "resourceValue",
+                        ]
+                    )
+                )
+                return False, None
 
             return True, "no diff detected"
 
@@ -219,6 +229,10 @@ class ImportTfFiles:
         :return: error (bool) and error message (if True) or False and DataFrame (if return_diff)
          or None (if not)
         """
+        self.mongo_connector_aci_tf = MongoConnector()
+        self.mongo_connector_aci_tf.init_client(collection_name="aciTfCollection")
+        self.import_time = time.time()
+
         self.search_tf_files()
         if len(self.tf_file_list) > 0:
             self.start_processing()
@@ -234,11 +248,10 @@ class ImportTfFiles:
         return True, f"no .tf files in {self.file_location}"
 
 
-# file_location = "/Users/antonyoliver/projects/aciTerraformServer/example"
 
 
 if __name__ == "__main__":
-    import_tf_files = ImportTfFiles(parse_args())
-    error, error_msg = import_tf_files.main()
-    if error:
-        print(error_msg)
+    import_tf_files = ImportTfFiles(parse_args()) # pragma: no cover
+    error, error_msg = import_tf_files.main() # pragma: no cover
+    if error: # pragma: no cover
+        print(error_msg) # pragma: no cover

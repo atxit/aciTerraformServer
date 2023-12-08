@@ -11,6 +11,8 @@ from source.web_server import (
     create_cfg_collection
 )
 
+PYTHONPATH = os.environ.get("PYTHONPATH")
+
 
 def open_file(path_to_file):
     with open(path_to_file, "r", encoding="UTF8") as file_open:
@@ -24,7 +26,7 @@ def test_return_css_route(client):
         open_file(
             str(
                 Path(
-                    os.path.dirname(os.getcwd()), "source", "static", "css", "style.css"
+                    PYTHONPATH, "source", "static", "css", "style.css"
                 )
             )
         )
@@ -44,7 +46,7 @@ def test_return_js_route(client):
         open_file(
             str(
                 Path(
-                    os.path.dirname(os.getcwd()), "source", "static", "js", "js_draw.js"
+                    PYTHONPATH, "source", "static", "js", "js_draw.js"
                 )
             )
         )
@@ -62,7 +64,7 @@ def test_get_table_page_route(client):
     assert response.status_code == 200
     assert (
         open_file(
-            str(Path(os.path.dirname(os.getcwd()), "source", "templates", "table.html"))
+            str(Path(PYTHONPATH, "source", "templates", "table.html"))
         )
         in response.data.decode()
     )
@@ -71,7 +73,7 @@ def test_get_table_page_route(client):
     assert response.status_code == 200
     assert (
         open_file(
-            str(Path(os.path.dirname(os.getcwd()), "source", "templates", "table.html"))
+            str(Path(PYTHONPATH, "source", "templates", "table.html"))
         )
         in response.data.decode()
     )
@@ -145,7 +147,7 @@ def test_get_diff_page(client):
     assert response.status_code == 200
     assert (
         open_file(
-            str(Path(os.path.dirname(os.getcwd()), "source", "templates", "diff.html"))
+            str(Path(PYTHONPATH, "source", "templates", "diff.html"))
         )
         in response.data.decode()
     )
@@ -163,7 +165,7 @@ def test_get_import_page(client):
             open_file(
                 str(
                     Path(
-                        os.path.dirname(os.getcwd()),
+                        PYTHONPATH,
                         "source",
                         "templates",
                         "import.html",
@@ -202,7 +204,7 @@ def test_get_compare_page(client):
         open_file(
             str(
                 Path(
-                    os.path.dirname(os.getcwd()), "source", "templates", "compare.html"
+                    PYTHONPATH, "source", "templates", "compare.html"
                 )
             )
         )

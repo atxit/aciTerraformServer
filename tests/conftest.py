@@ -27,6 +27,10 @@ def post_table_html_results():
         "data": '<table border="1" class="dataframe data-table" id="response-table">\n  <thead>\n    <tr style="text-align: center;">\n      <th>importTime</th>\n      <th>file</th>\n      <th>resourceType</th>\n      <th>resourceId</th>\n      <th>resourceKey</th>\n      <th>resourceValue</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>2023-12-07 14:19:28 UTC</td>\n      <td>/Users/machine/projects/aciTerraformServer/example/demo_app_profile.tf</td>\n      <td>aci_application_profile</td>\n      <td>aci_application_profile.demo-app-profile.id</td>\n      <td>resource.aci_application_profile.demo-app-profile.tenant_dn</td>\n      <td>aci_tenant.demo-test.id</td>\n    </tr>\n    <tr>\n      <td>2023-12-07 14:19:28 UTC</td>\n      <td>/Users/machine/projects/aciTerraformServer/example/aci_bgp_address_family_context.tf</td>\n      <td>aci_bgp_address_family_context</td>\n      <td>aci_bgp_address_family_context.bgp-family-context-example.id</td>\n      <td>resource.aci_bgp_address_family_context.bgp-family-context-example.tenant_dn</td>\n      <td>aci_tenant.demo-test.id</td>\n    </tr>\n    <tr>\n      <td>2023-12-07 14:19:28 UTC</td>\n      <td>/Users/machine/projects/aciTerraformServer/example/aci_vrf_demo.tf</td>\n      <td>aci_vrf</td>\n      <td>aci_vrf.demo-VRF.id</td>\n      <td>resource.aci_vrf.demo-VRF.tenant_dn</td>\n      <td>aci_tenant.demo-test.id</td>\n    </tr>\n    <tr>\n      <td>2023-12-07 14:19:28 UTC</td>\n      <td>/Users/machine/projects/aciTerraformServer/example/demo_app_epg.tf</td>\n      <td>aci_bridge_domain</td>\n      <td>aci_bridge_domain.demo-app-bd.id</td>\n      <td>resource.aci_bridge_domain.demo-app-bd.tenant_dn</td>\n      <td>aci_tenant.demo-test.id</td>\n    </tr>\n  </tbody>\n</table>',
     }
 
+@pytest.fixture
+def import_hcl_failed_results():
+    yield {'file': {1: 'test'}, 'resourceType': {1: 'failed to import'}, 'resourceId': {1: 'failed to import'}, 'resourceKey': {1: 'failed to import'}, 'resourceValue': {1: 'failed to import'}}
+
 
 @pytest.fixture
 def post_table_dict_results():

@@ -124,7 +124,7 @@ def write_collection_fixture():
     yield [
         {
             "_id": ObjectId("6572eaf01bc2d4a61510c592"),
-            "importTime": 1702030063.941511,
+            "importTime": "2023-12-08 10:07:43 UTC",
             "file": "/Users/machine/projects/aciTerraformServer/example/aci_bgp_address_family_context.tf",
             "resourceType": "aci_bgp_address_family_context",
             "resourceId": "aci_bgp_address_family_context.bgp-family-context-example.id",

@@ -1,8 +1,6 @@
 """
 Mongo Connector is responsible for all interactions between the code and the mongo DB
 """
-from datetime import datetime, timezone
-
 import pymongo
 from bson.objectid import ObjectId
 import pandas as pd
@@ -61,7 +59,7 @@ class MongoConnector:
         if len(df_results) > 0:
             df_results.drop_duplicates(inplace=True)
             df_results.drop(columns=["_id"], inplace=True)
-            df_results["importTime"] = df_results["importTime"].apply(epoch_to_utc)
+            # df_results["importTime"] = df_results["importTime"].apply(epoch_to_utc)
 
         return df_results
 
@@ -122,12 +120,3 @@ class MongoConnector:
                 self.collection.update_one(
                     {"_id": ObjectId(_id)}, {"$set": {update_column: updated_value}}
                 )
-
-
-def epoch_to_utc(epoch_value):
-    """
-    :param epoch_value: reformat epoch to UTC time stamp
-    :return: UTC time stamp
-    """
-    utc_datetime = datetime.utcfromtimestamp(epoch_value).replace(tzinfo=timezone.utc)
-    return utc_datetime.strftime("%Y-%m-%d %H:%M:%S UTC")

@@ -8,12 +8,13 @@ import glob
 import concurrent.futures
 import argparse
 import sys
+from datetime import datetime, timezone
 
 import pandas as pd
 import numpy as np
 import hcl
 
-from source.mongo_connect import MongoConnector, epoch_to_utc
+from source.mongo_connect import MongoConnector
 from source.constants import FIELD_LIST
 
 
@@ -111,7 +112,6 @@ class ImportTfFiles:
                     [self.df_tf, future_results.result()], axis=0, sort=False
                 )
 
-        print(self.df_tf)
         self.df_tf.index = np.arange(1, len(self.df_tf) + 1)
         if len(self.df_tf) > 0:
             self.df_tf.insert(0, "importTime", self.import_time)
@@ -128,7 +128,6 @@ class ImportTfFiles:
         )
 
         hcl_dict = open_hcl_file(file_path)
-        print(hcl_dict)
         if "locals" in hcl_dict:
             locals_dict = hcl_dict["locals"]
             for key_local, value_local in locals_dict.items():
@@ -139,9 +138,7 @@ class ImportTfFiles:
             return pd.DataFrame()
 
         if "resource" in hcl_dict or "module" in hcl_dict:
-            print(hcl_dict)
             for resource_key, resource_value in extract_data_from_dict(hcl_dict):
-                print(resource_key)
                 df_tf.loc[i, "file"] = file_path
                 df_tf.loc[i, "resourceType"] = str(resource_key.split(".")[1])
                 df_tf.loc[i, "resourceId"] = str(resolve_resource_id(resource_key))
@@ -189,10 +186,6 @@ class ImportTfFiles:
                 df_diff_concat.insert(0, "importTime", self.import_time)
 
                 if self.return_diff:
-                    print(df_diff_concat)
-                    df_diff_concat["importTime"] = df_diff_concat["importTime"].apply(
-                        epoch_to_utc
-                    )
                     return False, df_diff_concat
 
                 mongo_connector_diff = MongoConnector()
@@ -231,7 +224,7 @@ class ImportTfFiles:
         """
         self.mongo_connector_aci_tf = MongoConnector()
         self.mongo_connector_aci_tf.init_client(collection_name="aciTfCollection")
-        self.import_time = time.time()
+        self.import_time = epoch_to_utc(time.time())
 
         self.search_tf_files()
         if len(self.tf_file_list) > 0:
@@ -248,9 +241,17 @@ class ImportTfFiles:
         return True, f"no .tf files in {self.file_location}"
 
 
+def epoch_to_utc(epoch_value):
+    """
+    :param epoch_value: reformat epoch to UTC time stamp
+    :return: UTC time stamp
+    """
+    utc_datetime = datetime.utcfromtimestamp(epoch_value).replace(tzinfo=timezone.utc)
+    return utc_datetime.strftime("%Y-%m-%d %H:%M:%S UTC")
+
 
 if __name__ == "__main__":
-    import_tf_files = ImportTfFiles(parse_args()) # pragma: no cover
-    error, error_msg = import_tf_files.main() # pragma: no cover
-    if error: # pragma: no cover
-        print(error_msg) # pragma: no cover
+    import_tf_files = ImportTfFiles(parse_args())  # pragma: no cover
+    error, error_msg = import_tf_files.main()  # pragma: no cover
+    if error:  # pragma: no cover
+        print(error_msg)  # pragma: no cover

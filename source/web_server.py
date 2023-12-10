@@ -177,7 +177,6 @@ def process_table_query_request(request_url, request_json):
     """
     resp_dict = {}
     mongo_conn = MongoConnector()
-    print(request_url.split("/")[-1])
     if request_url.split("/")[-1] == "table":
         mongo_conn.init_client("aciTfCollection")
     else:

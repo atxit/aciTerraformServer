@@ -18,7 +18,7 @@ app = Flask(__name__)
 
 path_short_cut = {
     "example": str(Path(os.environ["PYTHONPATH"], "example")),
-    "proposed": str(Path(os.environ["PYTHONPATH"], "proposed")),
+    "compare": str(Path(os.environ["PYTHONPATH"], "proposed")),
 }
 
 

@@ -8,6 +8,10 @@ div {
     text-align: center;"
 }
 
+a {
+    width: 125px;
+}
+
 .topnav {
   overflow: hidden;
   background-color: #333;

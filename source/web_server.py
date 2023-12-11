@@ -1,6 +1,9 @@
 """
 ACI TF Web Services, responsible for serving HTML, JS, CSS and responding to API calls.
 """
+import os
+from pathlib import Path
+
 import pandas as pd
 from flask import Flask, render_template, request, jsonify, send_file
 
@@ -11,6 +14,12 @@ from source.aci_tf_draw import TfDraw
 from source.import_aci_tf import ImportTfFiles
 
 app = Flask(__name__)
+
+
+path_short_cut = {
+    "example": str(Path(os.environ["PYTHONPATH"], "example")),
+    "proposed": str(Path(os.environ["PYTHONPATH"], "proposed")),
+}
 
 
 @app.route("/css/<path:path>", methods=["GET"])
@@ -33,7 +42,7 @@ def return_js(path):
     return send_file(f"static/js/{path}")
 
 
-@app.route("/", methods=["GET"])
+@app.route("/acitfserver", methods=["GET"])
 @app.route("/table", methods=["GET"])
 def get_table_page():
     """
@@ -102,7 +111,11 @@ def post_import_page():
     """
     :return: import HTML
     """
-    import_tf_files = ImportTfFiles(file_location=request.get_json().get("path"))
+    import_tf_files = ImportTfFiles(
+        file_location=path_short_cut.get(
+            request.get_json().get("path"), request.get_json().get("path")
+        )
+    )
     error, error_msg = import_tf_files.main()
 
     if error:
@@ -147,7 +160,10 @@ def process_compare_request(request_json):
     :return: result dict
     """
     resp_dict = {}
-    import_tf_files = ImportTfFiles(request_json.get("path"), return_diff=True)
+    import_tf_files = ImportTfFiles(
+        path_short_cut.get(request_json.get("path"), request_json.get("path")),
+        return_diff=True,
+    )
     error, results = import_tf_files.main()
     if not error:
         resp_dict.update(
@@ -177,7 +193,6 @@ def process_table_query_request(request_url, request_json):
     """
     resp_dict = {}
     mongo_conn = MongoConnector()
-    print(request_url.split("/")[-1])
     if request_url.split("/")[-1] == "table":
         mongo_conn.init_client("aciTfCollection")
     else:

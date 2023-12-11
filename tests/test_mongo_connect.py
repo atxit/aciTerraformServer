@@ -4,7 +4,7 @@ from unittest.mock import patch, mock_open, MagicMock
 import pandas as pd
 import pytest
 
-from source.mongo_connect import MongoConnector, epoch_to_utc
+from source.mongo_connect import MongoConnector
 
 
 @patch("source.mongo_connect.pymongo")
@@ -153,7 +153,3 @@ def test_insert_single_value(return_value_from_table_fixture):
         update_column="test",
         updated_value="test",
     )
-
-
-def test_epoch_to_utc():
-    assert epoch_to_utc(111) == "1970-01-01 00:01:51 UTC"

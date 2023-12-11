@@ -10,6 +10,7 @@ from source.import_aci_tf import (
     resolve_resource_id,
     parse_args,
     ImportTfFiles,
+    epoch_to_utc,
 )
 
 
@@ -235,7 +236,7 @@ def test_perform_diff_no_diff(mocker):
     )
 
     error, result = import_tf.perform_diff()
-    assert error == True
+    assert error is True
     assert result == "no diff detected"
 
 
@@ -261,7 +262,7 @@ def test_perform_diff_missing(mocker):
     )
 
     error, result = import_tf.perform_diff()
-    assert error == True
+    assert error is True
     assert result == "could not diff, past or present DataFrames missing"
 
 
@@ -294,10 +295,10 @@ def test_perform_diff_diff_return(mocker):
     )
 
     error, result = import_tf.perform_diff()
-    assert error == False
+    assert error is False
     assert result.to_dict() == {
         "file": {1: "test"},
-        "importTime": {1: "1970-01-01 00:00:00 UTC"},
+        "importTime": {1: 0},
         "resourceId": {1: "test"},
         "resourceKey": {1: "resource.test"},
         "resourceType": {1: "test"},
@@ -336,7 +337,7 @@ def test_perform_diff_diff_mongo(patch_mongo, mocker):
     )
 
     error, result = import_tf.perform_diff()
-    assert error == False
+    assert error is False
     assert result == None
 
 
@@ -386,3 +387,7 @@ def test_main_return_tf_files(patch_mongo):
     error, result = import_tf.main()
     assert error is False
     assert result is None
+
+
+def test_epoch_to_utc():
+    assert epoch_to_utc(111) == "1970-01-01 00:01:51 UTC"

@@ -48,7 +48,7 @@ def test_return_js_route_nonexistent_file(client):
 
 
 def test_get_table_page_route(client):
-    response = client.get("/")
+    response = client.get("/acitfserver")
     assert response.status_code == 200
     assert (
         open_file(str(Path(PYTHONPATH, "source", "templates", "table.html")))

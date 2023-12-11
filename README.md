@@ -1,4 +1,5 @@
-Project Overview
+<h2>ACI Terraform Server</h2><br>
+Project Overview:
 
 Several years ago, I was actively involved in the design and implementation of multiple Cisco ACI networks.
 The central automation framework for this project was established using Terraform.
@@ -35,11 +36,11 @@ Prerequisites:
 - Git: Git is required for installing the code.
 
 1) Clone Repository: Clone this repository to your local environment.
-2) Install Dependencies: From the root of this Repository, run "poetry install" to install the project library dependencies.
+2) Install Dependencies: From the root of this repository, run "poetry install" to install the project library dependencies.
 3) Start MongoDB: Ensure MongoDB is up and running.
-4) setup PYTHONPATH: From the root of this Repository, run ". set_python_path.sh" 
+4) set PYTHONPATH: From the root of this repository, run ". set_python_path.sh" 
 5) Start Web Server: Run "make start" to start the web server.
-6) Access Web Interface: Open a web browser and enter http://127.0.0.1:5020 to access the project's web interface.
+6) Access Web Interface: Open a web browser and enter http://127.0.0.1:5020/acitfserver to access the project's web interface.
 
 For detailed guidance, please refer to the how-to guides available in the "howTo" folder.
 
